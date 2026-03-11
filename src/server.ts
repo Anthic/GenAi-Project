@@ -2,6 +2,8 @@ import http from "http";
 import app from "./app";
 import { env } from "./config/env";
 import { database } from "./config/db";
+import { connectRedis } from "./config/redis";
+import redisClient from "./config/redis";
 
 const PORT = env.app.port;
 const server = http.createServer(app);
@@ -15,6 +17,8 @@ const shutdown = async (signal: string): Promise<void> => {
 
     try {
       await database.disconnect();
+      await redisClient.quit();
+      console.log("[Redis] Disconnected gracefully");
       console.log("[Server] Shutdown complete");
       process.exit(0);
     } catch (err) {
@@ -48,6 +52,7 @@ process.on("SIGINT", () => shutdown("SIGINT")); // Ctrl+C
 const bootstrap = async (): Promise<void> => {
   try {
     await database.connect();
+    await connectRedis(); // Redis connect — auth middleware এর আগে দরকার
 
     server.listen(PORT, () => {
       console.log(

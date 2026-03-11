@@ -1,9 +1,38 @@
 import { Router } from "express";
 import { AuthController } from "./auth.controller";
+import { requireAuth } from "../../middleware/auth.middleware";
+import { rateLimit } from "express-rate-limit";
 
 const router = Router();
 
-router.post("/register", AuthController.register);
-router.post("/login", AuthController.login);
-router.post("/logout", AuthController.logout);
+// Brute force protection — login/register এ strict limit
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 15 মিনিটে সর্বোচ্চ 10 বার
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many attempts. Please try again after 15 minutes.",
+  },
+});
+
+// Refresh token এ একটু বেশি limit দেওয়া যায়
+const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many refresh attempts. Please try again later.",
+  },
+});
+
+router.post("/register", authLimiter, AuthController.register);
+router.post("/login", authLimiter, AuthController.login);
+router.post("/refresh", refreshLimiter, AuthController.refreshToken);
+router.get("/me", requireAuth, AuthController.getMe);
+router.post("/logout", requireAuth, AuthController.logout);
+
 export { router as AuthRoutes };

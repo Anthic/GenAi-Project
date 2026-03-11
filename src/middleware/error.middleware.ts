@@ -7,6 +7,9 @@ export class ApiError extends Error {
     public isOperational = true,
   ) {
     super(message);
+    this.name = this.constructor.name;
+    
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 

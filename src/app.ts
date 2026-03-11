@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express, { Application, Request, Response } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
@@ -6,6 +6,7 @@ import { notFoundHandler } from "./middleware/notFoundHandler";
 import { erroHandler } from "./middleware/error.middleware";
 import { StatusCodes } from "http-status-codes";
 import router from "./router";
+import { env } from "./config/env";
 class App {
   public app: Application;
   constructor() {
@@ -18,14 +19,24 @@ class App {
 
   private setSecurityMiddleware(): void {
     this.app.use(helmet());
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        // Production এ specific origin set করো — dev এ সব allow
+        origin: env.app.isProduction
+          ? (process.env.CLIENT_URL ?? "http://localhost:3000")
+          : true,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+      }),
+    );
     this.app.disable("x-powered-by");
   }
 
   private setGeneralMiddleware(): void {
     this.app.use(express.json({ limit: "15mb" }));
     this.app.use(express.urlencoded({ extended: true, limit: "15mb" }));
-    if (process.env.NODE_ENV !== "production") {
+    if (env.app.nodeEnv !== "production") {
       this.app.use(morgan("dev"));
     } else {
       this.app.use(morgan("combined"));
@@ -36,7 +47,7 @@ class App {
     this.app.get("/health", (_req: Request, res: Response) => {
       res.status(StatusCodes.OK).json({
         status: "ok",
-        environment: process.env.NODE_ENV,
+        environment: env.app.nodeEnv,
         timestamp: new Date().toISOString(),
       });
     });
@@ -44,14 +55,14 @@ class App {
       res.status(StatusCodes.OK).json({
         success: true,
         message: "Welcome to genAiProject API",
-        version: process.env.API_VERSION ?? "v1",
-        environment: process.env.NODE_ENV,
+        version: env.app.apiVersion ?? "v1",
+        environment: env.app.nodeEnv,
         timestamp: new Date().toISOString(),
       });
     });
 
     //all routes start here
-    this.app.use(`/api/${process.env.API_VERSION ?? "v1"}`, router);
+    this.app.use(`/api/${env.app.apiVersion ?? "v1"}`, router);
   }
 
   private setErrorHandlers(): void {
