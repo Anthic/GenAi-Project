@@ -4,7 +4,7 @@ import { LoginInput, RegisterInput } from "./auth.validation";
 import { User } from "./auth.model";
 import { ApiError } from "../../middleware/error.middleware";
 import { StatusCodes } from "http-status-codes";
-import redisClient, { isRedisReady, memBlacklistAdd, memBlacklistHas } from "../../config/redis";
+import redisClient, { isRedisReady, memBlacklistAdd } from "../../config/redis";
 
 interface TokenPayload {
   userId: string;
