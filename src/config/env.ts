@@ -26,9 +26,14 @@ export const env = {
     refreshSecret: required("JWT_REFRESH_SECRET"),
     refreshExpiresIn: optional("JWT_REFRESH_EXPIRES_IN", "30d"),
   },
+
   redis: {
     host: optional("REDIS_HOST", "localhost"),
     port: parseInt(optional("REDIS_PORT", "6379"), 10),
+  },
+
+  api: {
+    API_KEY: required("API_KEY"),
   },
   //   jwt: {
   //     secret: required("JWT_SECRET"),

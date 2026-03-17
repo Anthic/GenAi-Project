@@ -22,9 +22,7 @@ class App {
     this.app.use(
       cors({
         // Production এ specific origin set করো — dev এ সব allow
-        origin: env.app.isProduction
-          ? (process.env.CLIENT_URL ?? "http://localhost:3000")
-          : true,
+        origin: env.app.isProduction ? process.env.CLIENT_URL : true,
         credentials: true,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],

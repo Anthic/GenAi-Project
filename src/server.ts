@@ -4,10 +4,11 @@ import { env } from "./config/env";
 import { database } from "./config/db";
 import { connectRedis } from "./config/redis";
 import redisClient from "./config/redis";
+import invokeGeminiAi from "./modules/Interview/interviewAi.service";
 
 const PORT = env.app.port;
 const server = http.createServer(app);
-
+invokeGeminiAi()
 // Graceful shutdown handler
 const shutdown = async (signal: string): Promise<void> => {
   console.log(`\n[Server] ${signal} received. Shutting down gracefully...`);
