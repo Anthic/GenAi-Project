@@ -34,13 +34,11 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  // requireAuth middleware ইতিমধ্যে token validate করে req.token এ রেখেছে
   const accessToken = req.token;
   if (!accessToken) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "No token provided");
   }
 
-  // Client optionally refresh token পাঠাতে পারে body তে
   const refreshToken = req.body?.refreshToken as string | undefined;
 
   const result = await AuthService.logout(accessToken, refreshToken);

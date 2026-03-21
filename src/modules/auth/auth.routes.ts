@@ -5,10 +5,9 @@ import { rateLimit } from "express-rate-limit";
 
 const router = Router();
 
-// Brute force protection — login/register এ strict limit
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // 15 মিনিটে সর্বোচ্চ 10 বার
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -17,7 +16,6 @@ const authLimiter = rateLimit({
   },
 });
 
-// Refresh token এ একটু বেশি limit দেওয়া যায়
 const refreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,

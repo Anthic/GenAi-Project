@@ -31,7 +31,7 @@ export const register = async (data: RegisterInput) => {
 
   const user = await User.create(data);
   const tokens = generateTokens({
-    userId: user._id.toString(), // Fix: toJSON() থেকে toString() — সবসময় consistent string
+    userId: user._id.toString(),
     role: user.role,
   });
 
@@ -103,7 +103,6 @@ export const logout = async (accessToken: string, refreshToken?: string) => {
         }
       }
     } catch {
-      // Refresh token already expired — blacklist এর দরকার নেই
     }
   }
 
@@ -111,7 +110,6 @@ export const logout = async (accessToken: string, refreshToken?: string) => {
 };
 
 export const refreshAccessToken = async (refreshToken: string) => {
-  // Blacklist এ আছে কিনা check (Redis না থাকলে skip)
   if (isRedisReady()) {
     const isBlacklisted = await redisClient.get(`BL_${refreshToken}`);
     if (isBlacklisted) {
@@ -137,7 +135,6 @@ export const refreshAccessToken = async (refreshToken: string) => {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "User not found or inactive");
   }
 
-  // Refresh token rotate করো — পুরনো refresh token blacklist এ ফেলো (Redis থাকলে)
   if (isRedisReady() && decoded.exp) {
     const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
     if (expiresIn > 0) {
@@ -147,7 +144,6 @@ export const refreshAccessToken = async (refreshToken: string) => {
     }
   }
 
-  // নতুন token pair generate করো
   const tokens = generateTokens({
     userId: user._id.toString(),
     role: user.role,

@@ -11,16 +11,12 @@ const server = http.createServer(app);
 
 // Graceful shutdown handler
 const shutdown = async (signal: string): Promise<void> => {
-  console.log(`\n[Server] ${signal} received. Shutting down gracefully...`);
 
   server.close(async () => {
-    console.log("[Server] HTTP server closed");
 
     try {
       await database.disconnect();
       await redisClient.quit();
-      console.log("[Redis] Disconnected gracefully");
-      console.log("[Server] Shutdown complete");
       process.exit(0);
     } catch (err) {
       console.error("[Server] Error during shutdown:", err);
@@ -53,12 +49,9 @@ process.on("SIGINT", () => shutdown("SIGINT")); // Ctrl+C
 const bootstrap = async (): Promise<void> => {
   try {
     await database.connect();
-    await connectRedis(); // Redis connect — auth middleware এর আগে দরকার
+    await connectRedis();
 
     server.listen(PORT, () => {
-      console.log(
-        `[Server] Running on port ${PORT} | ENV: ${process.env.NODE_ENV}`,
-      );
     });
   } catch (err) {
     console.error("[Server] Failed to start:", err);

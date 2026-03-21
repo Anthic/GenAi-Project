@@ -22,6 +22,7 @@ interface IPreparationGap {
 /* ---------- Main Interface ---------- */
 
 export interface IInterview extends Document {
+  userId: mongoose.Types.ObjectId;
   jobDescription: string[];
   resumeText: string[];
   selfDescription: string[];
@@ -69,6 +70,7 @@ const preparationGapSchema = new Schema<IPreparationGap>(
 
 const interviewSchema = new Schema<IInterview>(
   {
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     jobDescription: [{ type: String, required: true }],
     resumeText: [{ type: String, required: true }],
     selfDescription: [{ type: String, required: true }],

@@ -15,7 +15,6 @@ class Database {
     }
 
     mongoose.connection.on("connected", () => {
-      console.log("[DB] MongoDB connected successfully");
     });
 
     mongoose.connection.on("error", (err) => {
@@ -59,7 +58,6 @@ class Database {
 
   async disconnect(): Promise<void> {
     await mongoose.connection.close();
-    console.log("[DB] MongoDB disconnected gracefully");
   }
 }
 

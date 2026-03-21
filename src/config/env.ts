@@ -33,7 +33,7 @@ export const env = {
   },
 
   api: {
-    API_KEY: required("API_KEY"),
+    GROQ_API_KEY: required("GROQ_API_KEY"),
   },
   //   jwt: {
   //     secret: required("JWT_SECRET"),

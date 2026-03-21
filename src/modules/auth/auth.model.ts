@@ -47,7 +47,6 @@ const userSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-// Save এর আগে password hash
 userSchema.pre("save", async function () {
   const user = this as IUser;
 

@@ -18,7 +18,6 @@ export const requireAuth = async (
 
     const token = authHeader.split(" ")[1];
 
-    // Blacklist check: Redis থাকলে Redis, না থাকলে in-memory fallback
     if (redisClient.isReady) {
       const isBlacklisted = await redisClient.get(`BL_${token}`);
       if (isBlacklisted) {
@@ -37,7 +36,6 @@ export const requireAuth = async (
     const decoded = jwt.verify(token, env.jwt.secret);
     req.user = decoded as jwt.JwtPayload;
 
-    // Raw token middleware থেকে pass করো — logout controller এ দরকার
     req.token = token;
 
     next();
@@ -53,7 +51,6 @@ export const requireAuth = async (
       );
     }
 
-    // ApiError (blacklist check, missing header) — as-is pass করো
     if (error instanceof ApiError) {
       return next(error);
     }
