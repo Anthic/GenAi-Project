@@ -26,7 +26,7 @@ class App {
         origin: (origin, callback) => {
           if (!origin) return callback(null, true); 
 
-          const allowedOrigins = [env.app.clientUrl, "http://localhost:3000"];
+          const allowedOrigins = [env.app.clientUrl, "https://gen-ai-frontend-three.vercel.app"];
           if (!env.app.isProduction || allowedOrigins.includes(origin)) {
             return callback(null, true);
           } else {
