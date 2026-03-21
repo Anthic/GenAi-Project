@@ -13,6 +13,10 @@ module.exports = [
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module"
+      },
+      env: {
+        node: true,       // 🔥 Node globals like process defined
+        es2021: true      // modern JS features
       }
     },
     plugins: {

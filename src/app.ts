@@ -7,8 +7,10 @@ import { erroHandler } from "./middleware/error.middleware";
 import { StatusCodes } from "http-status-codes";
 import router from "./router";
 import { env } from "./config/env";
+
 class App {
   public app: Application;
+
   constructor() {
     this.app = express();
     this.setSecurityMiddleware();
@@ -21,11 +23,20 @@ class App {
     this.app.use(helmet());
     this.app.use(
       cors({
-        origin: env.app.isProduction ? process.env.CLIENT_URL : true,
+        origin: (origin, callback) => {
+          if (!origin) return callback(null, true); 
+
+          const allowedOrigins = [env.app.clientUrl, "http://localhost:3000"];
+          if (!env.app.isProduction || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+          } else {
+            return callback(new Error(" CORS blocked"));
+          }
+        },
         credentials: true,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
-      }),
+      })
     );
     this.app.disable("x-powered-by");
   }
@@ -33,14 +44,13 @@ class App {
   private setGeneralMiddleware(): void {
     this.app.use(express.json({ limit: "15mb" }));
     this.app.use(express.urlencoded({ extended: true, limit: "15mb" }));
-    if (env.app.nodeEnv !== "production") {
-      this.app.use(morgan("dev"));
-    } else {
-      this.app.use(morgan("combined"));
-    }
+
+    this.app.use(
+      env.app.nodeEnv !== "production" ? morgan("dev") : morgan("combined")
+    );
   }
+
   private setRoutes(): void {
-    //helmet check - load balancer /k8s probe
     this.app.get("/health", (_req: Request, res: Response) => {
       res.status(StatusCodes.OK).json({
         status: "ok",
@@ -48,17 +58,17 @@ class App {
         timestamp: new Date().toISOString(),
       });
     });
-    this.app.get("/", (req: Request, res: Response) => {
+
+    this.app.get("/", (_req: Request, res: Response) => {
       res.status(StatusCodes.OK).json({
         success: true,
-        message: "Welcome to genAiProject API",
+        message: "Welcome to GenAiProject API",
         version: env.app.apiVersion ?? "v1",
         environment: env.app.nodeEnv,
         timestamp: new Date().toISOString(),
       });
     });
 
-    //all routes start here
     this.app.use(`/api/${env.app.apiVersion ?? "v1"}`, router);
   }
 

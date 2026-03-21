@@ -7,7 +7,7 @@ import puppeteer from "puppeteer";
 import { Interview } from "./interview.model";
 
 // Groq client initialize
-export const groq = new Groq({ apiKey: env.api.GROQ_API_KEY });
+export const groq = new Groq({ apiKey: env.api.groqKey });
 
 // ─── Types ───────────────────────────────────────────────
 
